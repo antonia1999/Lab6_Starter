@@ -1,12 +1,16 @@
 class RecipeCard extends HTMLElement {
   constructor() {
     // Part 1 Expose - TODO
+    super();
+    let shadow = this.attachShadow({mode: 'open'});
     // You'll want to attach the shadow DOM here
-      super();
-      var shadow =this.attachShadow({mode: 'open'});
   }
 
   set data(data) {
+    console.log(Object.keys(data));
+    //let myObj = JSON.parse(data);
+    //console.log(data);
+    //console.log(typeof(data));
     // This is the CSS that you'll use for your recipe cards
     const styleElem = document.createElement('style');
     const styles = `
@@ -19,7 +23,6 @@ class RecipeCard extends HTMLElement {
       a {
         text-decoration: none;
       }
-
       a:hover {
         text-decoration: underline;
       }
@@ -35,7 +38,6 @@ class RecipeCard extends HTMLElement {
         padding: 0 16px 16px 16px;
         width: 178px;
       }
-
       div.rating {
         align-items: center;
         column-gap: 5px;
@@ -48,7 +50,6 @@ class RecipeCard extends HTMLElement {
         object-fit: scale-down;
         width: 78px;
       }
-
       article > img {
         border-top-left-radius: 8px;
         border-top-right-radius: 8px;
@@ -57,7 +58,6 @@ class RecipeCard extends HTMLElement {
         margin-left: -16px;
         width: calc(100% + 32px);
       }
-
       p.ingredients {
         height: 32px;
         line-height: 16px;
@@ -68,7 +68,6 @@ class RecipeCard extends HTMLElement {
       p.organization {
         color: black !important;
       }
-
       p.title {
         display: -webkit-box;
         font-size: 16px;
@@ -78,7 +77,6 @@ class RecipeCard extends HTMLElement {
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
-
       p:not(.title), span, time {
         color: #70757A;
         font-size: 12px;
@@ -89,6 +87,59 @@ class RecipeCard extends HTMLElement {
     // Here's the root element that you'll want to attach all of your other elements to
     const card = document.createElement('article');
 
+    const thumbnail = document.createElement('img');
+    thumbnail.setAttribute('src', searchForKey(data, 'thumbnailUrl'));
+    thumbnail.setAttribute('alt', searchForKey(data, 'name'));
+    card.appendChild(thumbnail);
+    
+    console.log(searchForName(data, "name"));
+
+    const para1 = document.createElement('p');
+    para1.setAttribute('class', 'title');
+    const link1 = document.createElement('a');
+    link1.setAttribute('href', getUrl(data));
+    link1.innerHTML = searchForName(data, 'name');
+    para1.appendChild(link1);
+    card.appendChild(para1);
+
+    const para2 = document.createElement('p');
+    para2.setAttribute('class','organization');
+    para2.innerHTML = getOrganization(data);
+    card.appendChild(para2);
+
+    const div1 = document.createElement('div');
+    div1.setAttribute('class', 'rating');
+    const span1 = document.createElement('span');
+    let rating = searchForKey(data, 'aggregateRating');
+    if(rating == null){
+      span1.innerHTML = "No Review";
+      div1.appendChild(span1);
+    }else{
+      const img1 = document.createElement('img');
+      const span2 = document.createElement('span');
+      span1.innerHTML = rating.ratingValue;
+      img1.setAttribute('src', 'assets\\images\\icons\\' + Math.round(rating.ratingValue) + '-star.svg');
+      img1.setAttribute('alt', Math.round(rating.ratingValue) + ' stars');
+      span2.innerHTML = '(' + rating.ratingCount +')';
+      div1.appendChild(span1);
+      div1.appendChild(img1);
+      div1.appendChild(span2)
+    }
+    card.appendChild(div1);
+
+    const time1 = document.createElement('time');
+    const time1_v = searchForKey(data,'totalTime');
+    if(time1_v == null){
+      time1.innerHTML = "No time information Available"
+    }else{
+      time1.innerHTML = convertTime(time1_v);
+    }
+    card.appendChild(time1);
+
+    const para3 = document.createElement('p');
+    para3.setAttribute('class','ingredients');
+    para3.innerHTML = createIngredientList(searchForKey(data, "recipeIngredient"));
+    card.appendChild(para3);
     // Some functions that will be helpful here:
     //    document.createElement()
     //    document.querySelector()
@@ -99,11 +150,12 @@ class RecipeCard extends HTMLElement {
 
     // Make sure to attach your root element and styles to the shadow DOM you
     // created in the constructor()
-
+    let shadow = this.shadowRoot;
+    shadow.appendChild(styleElem);
+    shadow.appendChild(card);
     // Part 1 Expose - TODO
   }
 }
-
 
 /*********************************************************************/
 /***                       Helper Functions:                       ***/
@@ -117,7 +169,7 @@ class RecipeCard extends HTMLElement {
  * @param {String} key the key that you are looking for in the object
  * @returns {*} the value of the found key
  */
-function searchForKey(object, key) {
+ function searchForKey(object, key) {
   var value;
   Object.keys(object).some(function (k) {
     if (k === key) {

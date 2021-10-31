@@ -5,7 +5,7 @@
 const recipes = [
   'https://introweb.tech/assets/json/ghostCookies.json',
   'https://introweb.tech/assets/json/birthdayCake.json',
-  'https://introweb.tech/assets/json/chocolateChip.json'
+  'https://introweb.tech/assets/json/chocolateChip.json',
   'assets\\recipes\\recipe1.js',
   'assets\\recipes\\recipe2.js',
   'assets\\recipes\\recipe3.js'
@@ -15,6 +15,7 @@ const recipes = [
 // data will be added to this object below. You may use whatever you like for the
 // keys as long as it's unique, one suggestion might but the URL itself
 const recipeData = {}
+let buttonShowMore = false;
 
 window.addEventListener('DOMContentLoaded', init);
 
@@ -28,6 +29,7 @@ async function init() {
     return;
   };
   // Add the first three recipe cards to the page
+  console.log(recipeData);
   createRecipeCards();
   // Make the "Show more" button functional
   bindShowMore();
@@ -46,17 +48,42 @@ async function fetchRecipes() {
     // in the recipes folder and fetch them from there. You'll need to add their paths to the recipes array.
 
     // Part 1 Expose - TODO
-for (let i = 0; i <recipes.length; i++) {
-  fetch(recipes[i])
-  .then(response => response.json())
-  .then(data => {
-    recipeData[recipes[i]] = data;
-    console.log(Object.keys(recipeData).length);
-    if(Object.keys(recipeData).length == recipes.length){resolve(true);}
-  })
-  .catch((error) => {
-    reject(false);
-  })
+    //while (Object.keys(recipeData).length != recipes.length){
+      for (let i = 0; i <recipes.length; i++) {
+        fetch(recipes[i])
+        .then(response => response.json())
+        .then(data => {
+          recipeData[recipes[i]] = data;
+          console.log(Object.keys(recipeData).length);
+          if(Object.keys(recipeData).length == recipes.length){resolve(true);}
+        })
+        .catch((error) => {
+          reject(false);
+        })
+      }
+    //resolve(true);
+    //TODO: add the length of array check before resolve
+    // console.log(Object.keys(recipeData))
+    // if (Object.keys(recipeData).length == recipes.length) {
+    //   resolve(true);
+    // }
+  });
+  //   for (let i = 0; i <recipes.length; i++) {
+  //     recipeData[recipes[i]] = fetch(recipes[i])
+  //     .then(function(response) {
+  //       return response.json();
+  //     })
+  //     // .then(function(data) {
+  //     //   console.log(data);
+  //     // })
+  //     .catch((error) => {
+  //       reject(false);
+  //     })
+  //   }
+  //   console.log(typeof(fetchR))
+  //   recipeData[recipes[i]] = fetchR
+  //   resolve(true);
+  // });
 }
 
 function createRecipeCards() {
@@ -67,13 +94,12 @@ function createRecipeCards() {
   // show any others you've added when the user clicks on the "Show more" button.
 
   // Part 1 Expose - TODO
-  for (let i = 0; i <recipes.length; i++) {
+  for (let i = 0; i <3; i++) {
     let mycard = document.createElement('recipe-card');
     mycard.data = recipeData[recipes[i]];
     let mainElem = document.querySelector('main');
     mainElem.appendChild(mycard);
   }
-}
 }
 
 function bindShowMore() {
@@ -85,4 +111,23 @@ function bindShowMore() {
   // in the recipeData object where you stored them/
 
   // Part 2 Explore - TODO
+  document.querySelector("button").addEventListener("click", function(){
+    if(buttonShowMore == true){
+      for (let i = 0; i < 3; i++) {
+        let mycard = document.querySelector('recipe-card:nth-of-type('+(4)+')');
+        mycard.remove();
+        document.querySelector("button").innerHTML = "Show More";
+      }
+      buttonShowMore = false;
+    }else{
+      for (let i = 0; i < 3; i++) {
+        let mycard = document.createElement('recipe-card');
+        mycard.data = recipeData[recipes[3+i]];
+        let mainElem = document.querySelector('main');
+        mainElem.appendChild(mycard);
+        document.querySelector("button").innerHTML = "Show Less";
+      }
+      buttonShowMore = true;
+    }
+  })
 }

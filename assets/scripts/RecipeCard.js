@@ -91,14 +91,13 @@ class RecipeCard extends HTMLElement {
     thumbnail.setAttribute('src', searchForKey(data, 'thumbnailUrl'));
     thumbnail.setAttribute('alt', searchForKey(data, 'name'));
     card.appendChild(thumbnail);
-    
-    console.log(searchForName(data, "name"));
 
     const para1 = document.createElement('p');
     para1.setAttribute('class', 'title');
     const link1 = document.createElement('a');
     link1.setAttribute('href', getUrl(data));
-    link1.innerHTML = searchForName(data, 'name');
+    console.log(Object.keys(data))
+    link1.innerHTML = searchForKey(data, 'headline');
     para1.appendChild(link1);
     card.appendChild(para1);
 
